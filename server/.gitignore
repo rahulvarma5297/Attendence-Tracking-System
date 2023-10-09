@@ -1,0 +1,6 @@
+.DS_Store
+db/database.db
+recognizer/*
+images/*
+uploads/*
+.env
