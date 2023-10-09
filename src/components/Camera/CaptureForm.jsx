@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import Webcam from "react-webcam";
 import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
+
 import "./style.css";
 
 function CaptureForm() {
@@ -15,16 +16,16 @@ function CaptureForm() {
 
   const captureImage = () => {
     const imageSrc = webcamRef.current.getScreenshot();
-    if (images.length < 10) {
+    if (images.length < 5) {
       setImages([...images, imageSrc]);
-      setProgress(((images.length + 1) / 10) * 100);
+      setProgress(((images.length + 1) / 5) * 100);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (images.length !== 10) {
+    if (images.length !== 5) {
       return;
     }
 
@@ -43,7 +44,6 @@ function CaptureForm() {
     });
 
     try {
-      console.log(formData);
       await axios.post("http://localhost:5000/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -52,7 +52,14 @@ function CaptureForm() {
       alert("Data sent successfully");
     } catch (error) {
       console.error("Error sending data:", error);
-      alert("Error sending data");
+      alert(error.message);
+    } finally {
+      setStart(false);
+      setImages([]);
+      setProgress(0);
+      setName("");
+      setEmail("");
+      setRollno("");
     }
   };
 
@@ -82,45 +89,51 @@ function CaptureForm() {
       <form onSubmit={handleSubmit}>
         <div className="table-parent">
           <table className="form-table">
-            <tr>
-              <td>
-                <label>Name:</label>
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>Email:</label>
-              </td>
-              <td>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>Roll No:</label>
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={rollno}
-                  onChange={(e) => setRollno(e.target.value)}
-                  required
-                />
-              </td>
-            </tr>
+            <thead>
+
+              <tr>
+                <td>
+                  <label>Name:</label>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td>
+                  <label>Email:</label>
+                </td>
+                <td>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Roll No:</label>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={rollno}
+                    onChange={(e) => setRollno(e.target.value)}
+                    required
+                  />
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
@@ -137,7 +150,7 @@ function CaptureForm() {
               />
 
               <div>
-                {images.length === 10 ? (
+                {images.length === 5 ? (
                   <button className="btn" type="submit">
                     Submit Form with Images
                   </button>
@@ -145,9 +158,9 @@ function CaptureForm() {
                   <button
                     className="btn"
                     onClick={captureImage}
-                    disabled={images.length >= 10}
+                    disabled={images.length >= 5}
                   >
-                    Capture Image ({images.length}/10)
+                    Capture Image ({images.length}/5)
                   </button>
                 )}
               </div>
